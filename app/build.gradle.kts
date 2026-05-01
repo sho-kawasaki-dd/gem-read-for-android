@@ -79,6 +79,9 @@ dependencies {
     // Security
     implementation(libs.androidx.security.crypto)
 
+    // ExifInterface
+    implementation(libs.androidx.exifinterface)
+
     // Gemini
     implementation(libs.google.generativeai)
 

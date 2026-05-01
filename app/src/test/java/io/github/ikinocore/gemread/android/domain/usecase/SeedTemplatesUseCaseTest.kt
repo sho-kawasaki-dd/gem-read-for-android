@@ -3,12 +3,12 @@ package io.github.ikinocore.gemread.android.domain.usecase
 import android.content.Context
 import android.content.res.AssetManager
 import io.github.ikinocore.gemread.android.domain.repository.PromptTemplateRepository
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import io.mockk.Runs
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
