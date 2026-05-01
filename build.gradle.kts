@@ -30,6 +30,8 @@ subprojects {
         format("xml") {
             target("**/*.xml")
             targetExclude("**/build/**/*.xml")
+            trimTrailingWhitespace()
+            endWithNewline()
         }
     }
 }

@@ -42,15 +42,15 @@ class PromptTemplateRepositoryImpl @Inject constructor(
             return@withTransaction
         }
 
-        dao.deleteTemplate(template)
-
+        // Plan: "デフォルト指定中のテンプレを削除する場合は、削除前に sortOrder 最小の他テンプレを default に昇格させる"
+        // 昇格を先に行ってから削除することで仕様通りの順序を保証する。
         if (template.isDefault) {
-            // Plan: "デフォルト指定中のテンプレを削除する場合は、削除前に sortOrder 最小の他テンプレを default に昇格させる"
             val alternative = dao.getFirstAlternative(id)
             alternative?.let {
                 dao.updateTemplate(it.copy(isDefault = true))
             }
         }
+        dao.deleteTemplate(template)
     }
 
     override suspend fun setDefaultTemplate(id: Long) = database.withTransaction {

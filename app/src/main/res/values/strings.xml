@@ -1,3 +1,4 @@
 <resources>
+    <!-- アプリ名 -->
     <string name="app_name">Gem Read</string>
 </resources>
