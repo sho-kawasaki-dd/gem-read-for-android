@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<include-binary-data xmlns:android="http://schemas.android.com/apk/res/android">
+<full-backup-content>
     <include domain="file" path="." />
-</include-binary-data>
+</full-backup-content>
