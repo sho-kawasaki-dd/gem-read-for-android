@@ -2,6 +2,7 @@ package io.github.ikinocore.gemread.android.data.api
 
 import android.graphics.Bitmap
 import com.google.ai.client.generativeai.GenerativeModel
+import java.io.IOException
 import com.google.ai.client.generativeai.type.BlockThreshold
 import com.google.ai.client.generativeai.type.HarmCategory
 import com.google.ai.client.generativeai.type.SafetySetting
@@ -79,11 +80,16 @@ class GeminiClient @Inject constructor(
 
     private fun normalizeException(e: Throwable): GeminiError = when {
         e is GeminiError -> e
+        // HTTP 認証エラーを Auth に正規化する。
         e.message?.contains("API_KEY_INVALID", ignoreCase = true) == true -> GeminiError.Auth
         e.message?.contains("401") == true -> GeminiError.Auth
+        // レートリミット・クォータエラーを RateLimited に正規化する。
         e.message?.contains("429") == true -> GeminiError.RateLimited
         e.message?.contains("Quota exceeded", ignoreCase = true) == true -> GeminiError.RateLimited
-        // Add more mappings as needed based on SDK behavior
+        // ネットワーク接続エラー（ソケット切断・タイムアウト・DNS 解決失敗等）を Network に正規化する。
+        e is IOException -> GeminiError.Network
+        // SDK が例外をラップしている場合、原因の例外を再帰的に検査する。
+        e.cause != null && e.cause !== e -> normalizeException(e.cause!!)
         else -> GeminiError.Unknown(e)
     }
 }

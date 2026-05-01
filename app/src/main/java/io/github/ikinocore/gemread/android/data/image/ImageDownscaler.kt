@@ -26,7 +26,9 @@ class ImageDownscaler @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
     companion object {
-        private const val CACHE_DIR_NAME = "image_cache"
+        // 仕様: filesDir/cache/{uuid}.{ext} でキャッシュファイルを管理する。
+        private const val CACHE_DIR_NAME = "cache"
+        private const val HISTORY_DIR_NAME = "history"
         private const val MAX_SIDE_RESIZE_ON = 1568
         private const val JPEG_QUALITY_RESIZE_ON = 85
 
@@ -39,7 +41,7 @@ class ImageDownscaler @Inject constructor(
      * Returns the local File pointing to the processed image.
      */
     suspend fun processIncomingImage(uri: Uri): File = withContext(ioDispatcher) {
-        val cacheDir = File(context.cacheDir, CACHE_DIR_NAME).apply { if (!exists()) mkdirs() }
+        val cacheDir = File(context.filesDir, CACHE_DIR_NAME).apply { if (!exists()) mkdirs() }
         val extension = getExtensionFromUri(uri) ?: "jpg"
         val tempFile = File(cacheDir, "${UUID.randomUUID()}.$extension")
 
@@ -62,13 +64,26 @@ class ImageDownscaler @Inject constructor(
     }
 
     /**
-     * Cleans up all temporary files in the image cache directory.
+     * 一時キャッシュ（filesDir/cache/）内の全ファイルを削除する。
+     * アプリ起動時の sweep で呼び出し、未保存の temp ファイルを掃除する。
      */
     suspend fun clearCache() = withContext(ioDispatcher) {
-        val cacheDir = File(context.cacheDir, CACHE_DIR_NAME)
+        val cacheDir = File(context.filesDir, CACHE_DIR_NAME)
         if (cacheDir.exists()) {
             cacheDir.listFiles()?.forEach { it.delete() }
         }
+    }
+
+    /**
+     * 一時キャッシュファイルを履歴ディレクトリ（filesDir/history/{historyId}.{ext}）へ昇格させる。
+     * 履歴保存が確定した後に GenerationRepository から呼び出す。
+     */
+    suspend fun promoteToHistory(tempFile: File, historyId: Long): File = withContext(ioDispatcher) {
+        val historyDir = File(context.filesDir, HISTORY_DIR_NAME).apply { if (!exists()) mkdirs() }
+        val ext = tempFile.extension.ifBlank { "jpg" }
+        val historyFile = File(historyDir, "$historyId.$ext")
+        tempFile.copyTo(historyFile, overwrite = true)
+        historyFile
     }
 
     private fun isPassthroughAllowed(uri: Uri): Boolean {
