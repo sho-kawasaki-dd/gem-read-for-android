@@ -1,1 +1,0 @@
-Room schema JSON files are generated into this directory.
