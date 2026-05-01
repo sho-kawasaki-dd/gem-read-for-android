@@ -30,6 +30,10 @@
     - `ACTION_SEND_MULTIPLE` (image/*) -> **先頭1枚のみ処理**。上部バナーで通知。
     - `ACTION_PROCESS_TEXT` -> **読み取り専用**（`setResult()` を返さない）。
 - **画像 MIME:** `image/png`, `image/jpeg`, `image/webp` (HEIC/GIF は除外)。
+- **画像キャッシュ・履歴保存:**
+    - キャッシュ命名: `filesDir/cache/{uuid}.{ext}`
+    - 履歴命名: `filesDir/history/{id}.{ext}`
+    - 再エンコード時は `.jpg`、パススルー時は元形式に応じた拡張子を保持する。
 - **画像リサイズ (ON):** 長辺 1568px, JPEG quality 85。
 - **画像リサイズ (OFF):**
     - WebP/JPEG/PNG かつ フェイルセーフ（4096px/4MB）以下の場合はパススルー。

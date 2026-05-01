@@ -1,21 +1,20 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Gemini SDK
+-keep class com.google.ai.client.generativeai.** { *; }
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Room
+-keep class * extends androidx.room.RoomDatabase
+-keep class * { @androidx.room.Entity *; }
+-keep class * { @androidx.room.Dao *; }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Hilt
+-keep class * { @dagger.hilt.android.lifecycle.HiltViewModel *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Markdown renderer
+-keep class com.mikepenz.markdown.** { *; }
+
+# Cleartext traffic is denied by networkSecurityConfig, but we keep it here for safety
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepattributes EnclosingMethod
+-keepattributes InnerClasses
+-keepattributes SourceFile,LineNumberTable

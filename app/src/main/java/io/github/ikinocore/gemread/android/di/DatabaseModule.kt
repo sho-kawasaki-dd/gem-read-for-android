@@ -15,11 +15,9 @@ import javax.inject.Singleton
 object DatabaseModule {
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "gemread.db",
-        ).build()
-    }
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase = Room.databaseBuilder(
+        context,
+        AppDatabase::class.java,
+        "gemread.db",
+    ).build()
 }
