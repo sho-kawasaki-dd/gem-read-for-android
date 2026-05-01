@@ -42,6 +42,10 @@ android {
     }
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -68,11 +72,15 @@ dependencies {
     // API
     implementation(libs.google.genai)
 
+    // Async
+    implementation(libs.kotlinx.coroutines.android)
+
     // UI Utilities
     implementation(libs.coil.compose)
     implementation(libs.markdown.renderer)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso-core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

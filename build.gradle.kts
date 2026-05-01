@@ -7,3 +7,25 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.spotless) apply false
 }
+
+subprojects {
+    apply(plugin = "com.diffplug.spotless")
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        kotlin {
+            target("**/*.kt")
+            targetExclude("**/build/**/*.kt")
+            ktlint()
+        }
+        kotlinGradle {
+            target("**/*.kts")
+            targetExclude("**/build/**/*.kts")
+            ktlint()
+        }
+        format("misc") {
+            target("**/*.xml", "**/*.md", ".gitignore")
+            indentWithSpaces()
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+    }
+}
