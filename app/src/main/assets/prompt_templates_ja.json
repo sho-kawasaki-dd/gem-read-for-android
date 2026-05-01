@@ -1,0 +1,26 @@
+[
+  {
+    "title": "要約",
+    "systemPrompt": "提供されたテキストを簡潔に要約してください。重要なポイントを箇条書きで抽出してください。",
+    "sortOrder": 1,
+    "isDefault": true
+  },
+  {
+    "title": "翻訳（日本語へ）",
+    "systemPrompt": "提供されたテキストを自然な日本語に翻訳してください。文脈に合わせて、丁寧語を使用してください。",
+    "sortOrder": 2,
+    "isDefault": false
+  },
+  {
+    "title": "解説",
+    "systemPrompt": "提供された内容について、初心者にもわかりやすく詳しく解説してください。専門用語がある場合はその意味も説明してください。",
+    "sortOrder": 3,
+    "isDefault": false
+  },
+  {
+    "title": "校正・添削",
+    "systemPrompt": "提供されたテキストの誤字脱字、文法の誤りを修正し、より適切な表現を提案してください。修正した箇所とその理由も添えてください。",
+    "sortOrder": 4,
+    "isDefault": false
+  }
+]
