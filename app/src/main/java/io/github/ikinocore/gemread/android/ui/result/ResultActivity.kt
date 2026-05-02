@@ -3,6 +3,7 @@ package io.github.ikinocore.gemread.android.ui.result
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -55,6 +56,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,6 +65,7 @@ import com.mikepenz.markdown.m3.Markdown
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.ikinocore.gemread.android.R
 import io.github.ikinocore.gemread.android.data.api.GeminiError
+import io.github.ikinocore.gemread.android.ui.settings.SettingsActivity
 import io.github.ikinocore.gemread.android.ui.theme.GemReadForAndroidTheme
 
 /**
@@ -97,7 +100,7 @@ class ResultActivity : ComponentActivity() {
                                 Toast.makeText(context, R.string.action_copy, Toast.LENGTH_SHORT).show()
                             }
                             ResultUiEffect.NavigateToSettings -> {
-                                // TODO: SettingsActivity 実装後に遷移処理を追加
+                                startActivity(Intent(this@ResultActivity, SettingsActivity::class.java))
                             }
                             ResultUiEffect.ShowPinnedMessage -> {
                                 Toast.makeText(context, R.string.action_pin, Toast.LENGTH_SHORT).show()
@@ -261,10 +264,13 @@ fun ResultScreen(
                             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                             Spacer(Modifier.height(8.dp))
                         }
-                        // Markdown 形式で回答を表示
+                        // Markdown 形式で回答を表示。
+                        // mergeDescendants=true で TalkBack が出力全体を 1 ブロックとして読み上げる。
                         Markdown(
                             content = uiState.outputText,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .semantics(mergeDescendants = true) {},
                         )
                     }
                 }

@@ -38,12 +38,18 @@ interface HistoryDao {
     @Query("SELECT * FROM history_entries WHERE id = :id")
     suspend fun getHistoryById(id: Long): HistoryEntryEntity?
 
-    // Pruning: Delete old entries that are not pinned
+    // Pruning: pinned=0 のエントリのみを対象に古い順から削除し、最大 maxCount 件を保持する。
+    // サブクエリは unpinned のみを対象とするため、pinned エントリはカウントを圧迫しない。
     @Query(
         """
         DELETE FROM history_entries
         WHERE pinned = 0
-        AND (id NOT IN (SELECT id FROM history_entries WHERE pinned = 1 OR 1=1 ORDER BY createdAt DESC LIMIT :maxCount))
+        AND id NOT IN (
+            SELECT id FROM history_entries
+            WHERE pinned = 0
+            ORDER BY createdAt DESC
+            LIMIT :maxCount
+        )
         """,
     )
     suspend fun pruneByCount(maxCount: Int)

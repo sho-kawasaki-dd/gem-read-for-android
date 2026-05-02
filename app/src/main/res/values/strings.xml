@@ -2,6 +2,9 @@
     <!-- アプリ名 -->
     <string name="app_name">Gem Read</string>
 
+    <!-- Settings Screen -->
+    <string name="title_settings">設定</string>
+
     <!-- Result Screen -->
     <string name="result_title">Gemini の回答</string>
     <string name="action_copy">コピー</string>
