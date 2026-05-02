@@ -2,7 +2,6 @@ package io.github.ikinocore.gemread.android.data.api
 
 import android.graphics.Bitmap
 import com.google.ai.client.generativeai.GenerativeModel
-import java.io.IOException
 import com.google.ai.client.generativeai.type.BlockThreshold
 import com.google.ai.client.generativeai.type.HarmCategory
 import com.google.ai.client.generativeai.type.SafetySetting
@@ -12,6 +11,7 @@ import io.github.ikinocore.gemread.android.data.prefs.SecurePreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 

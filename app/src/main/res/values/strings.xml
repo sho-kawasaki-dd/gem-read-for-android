@@ -1,4 +1,20 @@
 <resources>
     <!-- アプリ名 -->
     <string name="app_name">Gem Read</string>
+
+    <!-- Result Screen -->
+    <string name="result_title">Gemini の回答</string>
+    <string name="action_copy">コピー</string>
+    <string name="action_regenerate">再生成</string>
+    <string name="action_settings">設定</string>
+    <string name="action_pin">ピン留め</string>
+    <string name="status_loading">回答を生成中…</string>
+    <string name="status_streaming">回答を受信中…</string>
+    <string name="error_auth">認証に失敗しました。APIキーを確認してください。</string>
+    <string name="error_network">ネットワークエラーが発生しました。</string>
+    <string name="error_rate_limited">レート制限に達しました。しばらく待ってから再試行してください。</string>
+    <string name="error_unknown">予期せぬエラーが発生しました。</string>
+    <string name="error_process_death">アプリのプロセスが終了したため、生成が中断されました。</string>
+    <string name="msg_multiple_images">先頭の1枚のみ処理しました。複数枚同時解析は今後対応予定です。</string>
+    <string name="content_description_input_preview">入力画像のプレビュー</string>
 </resources>

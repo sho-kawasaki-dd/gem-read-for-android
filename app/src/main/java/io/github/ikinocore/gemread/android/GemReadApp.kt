@@ -3,10 +3,13 @@ package io.github.ikinocore.gemread.android
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import io.github.ikinocore.gemread.android.data.image.ImageDownscaler
+import io.github.ikinocore.gemread.android.data.prefs.AppPreferences
+import io.github.ikinocore.gemread.android.domain.repository.HistoryRepository
 import io.github.ikinocore.gemread.android.domain.usecase.SeedTemplatesUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,6 +21,12 @@ class GemReadApp : Application() {
     lateinit var seedTemplatesUseCase: SeedTemplatesUseCase
 
     @Inject
+    lateinit var historyRepository: HistoryRepository
+
+    @Inject
+    lateinit var appPreferences: AppPreferences
+
+    @Inject
     lateinit var imageDownscaler: ImageDownscaler
 
     // アプリプロセスのライフサイクルと同期する CoroutineScope。
@@ -26,15 +35,19 @@ class GemReadApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // 初回起動時のテンプレート seed を Application 起点で実行する。
-        // ShareReceiverActivity など MainActivity を経由しないエントリポイントでも
-        // 確実に seed が走るよう、Application.onCreate() で呼び出す。
+        // 起動時のメンテナンス処理
         applicationScope.launch {
+            // 1. テンプレートのシード投入（初回起動時のみ）
             seedTemplatesUseCase()
-        }
-        // 起動時 sweep: 前回セッションで保存されなかった一時画像キャッシュを削除する。
-        // 履歴に昇格済みの画像は filesDir/history/ に移動済みのため影響を受けない。
-        applicationScope.launch {
+
+            // 2. 履歴の pruning (最大件数・保持日数)
+            // pinned=1 のエントリーは SQL 側で除外されている。
+            val maxCount = appPreferences.historyRetentionCount.first()
+            val maxDays = appPreferences.historyRetentionDays.first()
+            historyRepository.pruneHistory(maxCount, maxDays)
+
+            // 3. 起動時 sweep: 前回セッションで保存されなかった一時画像キャッシュを削除する。
+            // 履歴に昇格済みの画像は filesDir/history/ に移動済みのため影響を受けない。
             imageDownscaler.clearCache()
         }
     }

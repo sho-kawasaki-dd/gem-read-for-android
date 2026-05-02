@@ -1,6 +1,7 @@
 package io.github.ikinocore.gemread.android.domain.repository
 
 import android.net.Uri
+import io.github.ikinocore.gemread.android.domain.model.GenerationEvent
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -22,5 +23,5 @@ interface GenerationRepository {
         prompt: String,
         imageUri: Uri? = null,
         templateId: Long? = null,
-    ): Flow<String>
+    ): Flow<GenerationEvent>
 }
