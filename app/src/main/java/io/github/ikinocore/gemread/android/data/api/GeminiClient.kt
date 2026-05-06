@@ -70,12 +70,15 @@ class GeminiClient @Inject constructor(
     /**
      * Performs a connection test (ping) with minimal cost.
      */
-    suspend fun testConnection(): Result<Unit> = runCatching {
-        val model = getGenerativeModel()
-        model.generateContent("ping")
-        Unit
-    }.onFailure {
-        throw normalizeException(it)
+    suspend fun testConnection(): Result<Unit> {
+        return runCatching {
+            val model = getGenerativeModel()
+            model.generateContent("ping")
+            Unit
+        }.fold(
+            onSuccess = { Result.success(Unit) },
+            onFailure = { Result.failure(normalizeException(it)) },
+        )
     }
 
     private fun normalizeException(e: Throwable): GeminiError = when {

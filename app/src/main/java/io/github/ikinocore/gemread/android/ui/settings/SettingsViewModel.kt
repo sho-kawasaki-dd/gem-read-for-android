@@ -4,12 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.ikinocore.gemread.android.data.api.GeminiClient
+import io.github.ikinocore.gemread.android.data.api.GeminiError
 import io.github.ikinocore.gemread.android.data.prefs.AppPreferences
 import io.github.ikinocore.gemread.android.data.prefs.SecurePreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -22,39 +22,47 @@ class SettingsViewModel @Inject constructor(
     private val geminiClient: GeminiClient,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SettingsUiState())
-    val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+    private val apiKey = MutableStateFlow(securePreferences.getApiKey().orEmpty())
+    private val connectionStatus = MutableStateFlow(SettingsConnectionStatus.Idle)
 
-    init {
-        viewModelScope.launch {
-            combine(
-                securePreferences.getApiKey(),
-                appPreferences.modelName,
-                appPreferences.baseSystemPrompt,
-                appPreferences.isImageResizeEnabled,
-                appPreferences.isStreamingEnabled,
-                appPreferences.historyRetentionCount,
-                appPreferences.historyRetentionDays
-            ) { apiKey, modelName, systemPrompt, resize, streaming, count, days ->
-                SettingsUiState(
-                    apiKey = apiKey ?: "",
-                    modelName = modelName,
-                    baseSystemPrompt = systemPrompt,
-                    isImageResizeEnabled = resize,
-                    isStreamingEnabled = streaming,
-                    historyRetentionCount = count,
-                    historyRetentionDays = days
-                )
-            }.collect { _uiState.value = it }
-        }
-    }
+    val uiState: StateFlow<SettingsUiState> = combine(
+        apiKey,
+        appPreferences.modelName,
+        appPreferences.baseSystemPrompt,
+        appPreferences.isImageResizeEnabled,
+        appPreferences.isStreamingEnabled,
+        appPreferences.historyRetentionCount,
+        appPreferences.historyRetentionDays,
+        connectionStatus,
+    ) { args ->
+        SettingsUiState(
+            apiKey = args[0] as String,
+            modelName = args[1] as String,
+            baseSystemPrompt = args[2] as String,
+            isImageResizeEnabled = args[3] as Boolean,
+            isStreamingEnabled = args[4] as Boolean,
+            historyRetentionCount = args[5] as Int,
+            historyRetentionDays = args[6] as Int,
+            connectionStatus = args[7] as SettingsConnectionStatus,
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
 
     fun updateApiKey(apiKey: String) {
-        viewModelScope.launch { securePreferences.saveApiKey(apiKey) }
+        val normalizedApiKey = apiKey.trim()
+        if (normalizedApiKey.isEmpty()) {
+            securePreferences.clearApiKey()
+        } else {
+            securePreferences.setApiKey(normalizedApiKey)
+        }
+        this.apiKey.value = normalizedApiKey
+        connectionStatus.value = SettingsConnectionStatus.Idle
     }
 
     fun updateModelName(modelName: String) {
-        viewModelScope.launch { appPreferences.setModelName(modelName) }
+        viewModelScope.launch {
+            appPreferences.setModelName(modelName)
+            connectionStatus.value = SettingsConnectionStatus.Idle
+        }
     }
 
     fun updateBaseSystemPrompt(prompt: String) {
@@ -70,24 +78,39 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun updateHistoryRetentionCount(count: Int) {
+        if (count <= 0) return
         viewModelScope.launch { appPreferences.setHistoryRetentionCount(count) }
     }
 
     fun updateHistoryRetentionDays(days: Int) {
+        if (days <= 0) return
         viewModelScope.launch { appPreferences.setHistoryRetentionDays(days) }
     }
 
     fun testConnection() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isTestingConnection = true, connectionError = null)
+            if (apiKey.value.isBlank()) {
+                connectionStatus.value = SettingsConnectionStatus.AuthError
+                return@launch
+            }
+
+            connectionStatus.value = SettingsConnectionStatus.Testing
             geminiClient.testConnection()
-                .onSuccess { _uiState.value = _uiState.value.copy(isTestingConnection = false) }
-                .onFailure { error ->
-                    _uiState.value = _uiState.value.copy(
-                        isTestingConnection = false,
-                        connectionError = error.message
-                    )
+                .onSuccess {
+                    connectionStatus.value = SettingsConnectionStatus.Success
                 }
+                .onFailure { error ->
+                    connectionStatus.value = error.toConnectionStatus()
+                }
+        }
+    }
+
+    private fun Throwable.toConnectionStatus(): SettingsConnectionStatus {
+        return when (this) {
+            GeminiError.Auth -> SettingsConnectionStatus.AuthError
+            GeminiError.Network -> SettingsConnectionStatus.NetworkError
+            GeminiError.RateLimited -> SettingsConnectionStatus.RateLimitedError
+            else -> SettingsConnectionStatus.UnknownError
         }
     }
 }
@@ -100,6 +123,15 @@ data class SettingsUiState(
     val isStreamingEnabled: Boolean = true,
     val historyRetentionCount: Int = 200,
     val historyRetentionDays: Int = 90,
-    val isTestingConnection: Boolean = false,
-    val connectionError: String? = null
+    val connectionStatus: SettingsConnectionStatus = SettingsConnectionStatus.Idle,
 )
+
+enum class SettingsConnectionStatus {
+    Idle,
+    Testing,
+    Success,
+    AuthError,
+    NetworkError,
+    RateLimitedError,
+    UnknownError,
+}
