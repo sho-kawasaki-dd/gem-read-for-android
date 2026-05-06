@@ -9,9 +9,9 @@ activityCompose = "1.10.0"
 kotlin = "2.2.10"
 serialization = "1.7.3"
 composeBom = "2025.02.00"
-hilt = "2.54"
+hilt = "2.59.2"
 ksp = "2.3.2"
-room = "2.6.1"
+room = "2.7.2"
 datastore = "1.1.2"
 security = "1.1.0-alpha06"
 exifinterface = "1.4.2"
@@ -39,6 +39,7 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 google-android-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 # Hilt

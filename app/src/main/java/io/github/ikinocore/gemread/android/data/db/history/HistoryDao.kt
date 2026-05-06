@@ -33,7 +33,7 @@ interface HistoryDao {
     suspend fun deleteHistory(entry: HistoryEntryEntity)
 
     @Query("DELETE FROM history_entries WHERE id = :id")
-    suspend fun deleteHistoryById(id: Long)
+    suspend fun deleteHistoryById(id: Long): Int
 
     @Query("SELECT * FROM history_entries WHERE id = :id")
     suspend fun getHistoryById(id: Long): HistoryEntryEntity?
@@ -52,8 +52,8 @@ interface HistoryDao {
         )
         """,
     )
-    suspend fun pruneByCount(maxCount: Int)
+    suspend fun pruneByCount(maxCount: Int): Int
 
     @Query("DELETE FROM history_entries WHERE pinned = 0 AND createdAt < :thresholdTimestamp")
-    suspend fun pruneByDate(thresholdTimestamp: Long)
+    suspend fun pruneByDate(thresholdTimestamp: Long): Int
 }

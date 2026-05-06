@@ -32,7 +32,7 @@ interface PromptTemplateDao {
     suspend fun deleteTemplate(template: PromptTemplateEntity)
 
     @Query("UPDATE prompt_templates SET isDefault = 0 WHERE isDefault = 1")
-    suspend fun clearDefault()
+    suspend fun clearDefault(): Int
 
     @Query("SELECT COUNT(*) FROM prompt_templates")
     suspend fun getCount(): Int

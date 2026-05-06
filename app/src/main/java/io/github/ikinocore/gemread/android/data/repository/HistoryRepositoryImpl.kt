@@ -21,7 +21,9 @@ class HistoryRepositoryImpl @Inject constructor(
 
     override suspend fun updateHistory(entry: HistoryEntryEntity) = dao.updateHistory(entry)
 
-    override suspend fun deleteHistory(id: Long) = dao.deleteHistoryById(id)
+    override suspend fun deleteHistory(id: Long) {
+        dao.deleteHistoryById(id)
+    }
 
     override suspend fun getHistoryById(id: Long): HistoryEntryEntity? = dao.getHistoryById(id)
 
