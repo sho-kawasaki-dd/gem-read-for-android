@@ -81,7 +81,7 @@ class GeminiClient @Inject constructor(
         )
     }
 
-    private fun normalizeException(e: Throwable): GeminiError = when {
+    internal fun normalizeException(e: Throwable): GeminiError = when {
         e is GeminiError -> e
         // HTTP 認証エラーを Auth に正規化する。
         e.message?.contains("API_KEY_INVALID", ignoreCase = true) == true -> GeminiError.Auth

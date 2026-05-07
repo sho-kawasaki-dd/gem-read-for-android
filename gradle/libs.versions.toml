@@ -21,6 +21,7 @@ markdown = "0.29.0"
 coroutines = "1.10.1"
 spotless = "7.0.2"
 mockk = "1.14.0"
+turbine = "1.1.0"
 material = "1.12.0"
 
 [libraries]
@@ -74,6 +75,7 @@ markdown-renderer = { group = "com.mikepenz", name = "multiplatform-markdown-ren
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 # Serialization
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }

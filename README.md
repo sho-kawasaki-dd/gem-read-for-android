@@ -12,3 +12,23 @@ OS標準の共有インテント（ACTION_SEND）やテキスト選択メニュ�
 
 ## ライセンス
 Apache License 2.0
+
+## 開発と署名
+本プロジェクトは GitHub Actions を用いた CI/CD を構築しています。
+
+### CI 設定 (GitHub Secrets)
+リリースの自動ビルドと署名には以下の Secrets 設定が必要です：
+- `KEYSTORE_BASE64`: リリース用キーストアファイルを Base64 エンコードした文字列
+- `KEYSTORE_PASSWORD`: キーストアのパスワード
+- `KEY_ALIAS`: 鍵のエイリアス
+- `KEY_PASSWORD`: 鍵のパスワード
+
+### ローカルでの署名ビルド
+ローカル環境で署名付きビルドを行う場合は、`local.properties` または `gradle.properties` に以下の情報を追記してください：
+```properties
+RELEASE_KEYSTORE_PATH=/path/to/your/release.keystore
+RELEASE_KEYSTORE_PASSWORD=your_password
+RELEASE_KEY_ALIAS=your_alias
+RELEASE_KEY_PASSWORD=your_password
+```
+あるいは環境変数 `KEYSTORE_PATH`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD` を設定することでもビルド可能です。
