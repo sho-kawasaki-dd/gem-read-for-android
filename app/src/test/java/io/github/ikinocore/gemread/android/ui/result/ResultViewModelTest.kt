@@ -9,16 +9,21 @@ import io.github.ikinocore.gemread.android.domain.repository.PromptTemplateRepos
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -85,6 +90,93 @@ class ResultViewModelTest {
             assertEquals("saved output", lastState.outputText)
             assertEquals(ResultUiState.Status.Error, lastState.status)
             assertEquals(true, lastState.isProcessDeath)
+        }
+    }
+
+    @Test
+    fun `startGeneration should append chunks and expose history id on success`() = runTest {
+        val savedStateHandle = SavedStateHandle(mapOf(ResultViewModel.KEY_INPUT_TEXT to "input"))
+        val template = PromptTemplateEntity(id = 1, title = "T", systemPrompt = "S", sortOrder = 0, isDefault = true)
+
+        every { promptTemplateRepository.getAllTemplates() } returns flowOf(listOf(template))
+        coEvery { promptTemplateRepository.getDefaultTemplate() } returns template
+        every {
+            generationRepository.generate(
+                prompt = "input",
+                imageUri = null,
+                templateId = 1L,
+            )
+        } returns flow {
+            emit(io.github.ikinocore.gemread.android.domain.model.GenerationEvent.Chunk("he"))
+            emit(io.github.ikinocore.gemread.android.domain.model.GenerationEvent.Chunk("llo"))
+            emit(io.github.ikinocore.gemread.android.domain.model.GenerationEvent.Completed(99L))
+        }
+
+        val viewModel = ResultViewModel(
+            savedStateHandle,
+            generationRepository,
+            promptTemplateRepository,
+            historyRepository,
+        )
+
+        viewModel.uiState.test {
+            var sawStreaming = false
+            var successState: ResultUiState? = null
+
+            while (successState == null) {
+                val state = awaitItem()
+                if (state.status == ResultUiState.Status.Streaming) {
+                    sawStreaming = true
+                }
+                if (state.status == ResultUiState.Status.Success) {
+                    successState = state
+                }
+            }
+
+            assertTrue(sawStreaming)
+            assertEquals("hello", successState?.outputText)
+            assertEquals(99L, successState?.historyId)
+            assertNull(savedStateHandle.get<String>("output_text"))
+        }
+    }
+
+    @Test
+    fun `onRetry should re-run generation with current input and template`() = runTest {
+        val savedStateHandle = SavedStateHandle(mapOf(ResultViewModel.KEY_INPUT_TEXT to "input"))
+        val template = PromptTemplateEntity(id = 1, title = "T", systemPrompt = "S", sortOrder = 0, isDefault = true)
+
+        every { promptTemplateRepository.getAllTemplates() } returns flowOf(listOf(template))
+        coEvery { promptTemplateRepository.getDefaultTemplate() } returns template
+        every {
+            generationRepository.generate(
+                prompt = "input",
+                imageUri = null,
+                templateId = 1L,
+            )
+        } returnsMany listOf(
+            flowOf(io.github.ikinocore.gemread.android.domain.model.GenerationEvent.Completed(1L)),
+            flowOf(io.github.ikinocore.gemread.android.domain.model.GenerationEvent.Completed(2L)),
+        )
+
+        val viewModel = ResultViewModel(
+            savedStateHandle,
+            generationRepository,
+            promptTemplateRepository,
+            historyRepository,
+        )
+        advanceUntilIdle()
+
+        viewModel.onEvent(ResultUiEvent.OnRetry)
+        advanceUntilIdle()
+
+        assertEquals(ResultUiState.Status.Success, viewModel.uiState.value.status)
+        assertEquals(2L, viewModel.uiState.value.historyId)
+        verify(exactly = 2) {
+            generationRepository.generate(
+                prompt = "input",
+                imageUri = null,
+                templateId = 1L,
+            )
         }
     }
 }

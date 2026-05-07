@@ -14,6 +14,19 @@ android {
     namespace = "io.github.ikinocore.gemread.android"
     compileSdk = 35
 
+    val localProperties = Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use(::load)
+        }
+    }
+
+    fun resolveSigningProperty(envName: String, propertyName: String): String? {
+        return System.getenv(envName)
+            ?: localProperties.getProperty(propertyName)
+            ?: project.findProperty(propertyName)?.toString()
+    }
+
     defaultConfig {
         applicationId = "io.github.ikinocore.gemread.android"
         minSdk = 29
@@ -27,13 +40,12 @@ android {
     signingConfigs {
         create("release") {
             val keystoreFile = project.rootProject.file("release.keystore")
-            // GitHub Actions uses runner.temp/release.keystore, so we check environment variable first
-            val keystorePath = System.getenv("KEYSTORE_PATH") ?: project.findProperty("RELEASE_KEYSTORE_PATH")?.toString()
+            val keystorePath = resolveSigningProperty("KEYSTORE_PATH", "RELEASE_KEYSTORE_PATH")
 
             storeFile = if (keystorePath != null) file(keystorePath) else keystoreFile
-            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: project.findProperty("RELEASE_KEYSTORE_PASSWORD")?.toString()
-            keyAlias = System.getenv("KEY_ALIAS") ?: project.findProperty("RELEASE_KEY_ALIAS")?.toString()
-            keyPassword = System.getenv("KEY_PASSWORD") ?: project.findProperty("RELEASE_KEY_PASSWORD")?.toString()
+            storePassword = resolveSigningProperty("KEYSTORE_PASSWORD", "RELEASE_KEYSTORE_PASSWORD")
+            keyAlias = resolveSigningProperty("KEY_ALIAS", "RELEASE_KEY_ALIAS")
+            keyPassword = resolveSigningProperty("KEY_PASSWORD", "RELEASE_KEY_PASSWORD")
         }
     }
 
