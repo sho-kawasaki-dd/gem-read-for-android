@@ -25,6 +25,9 @@
     <string name="action_show">表示</string>
     <string name="action_hide">隠す</string>
     <string name="action_open_settings">設定を開く</string>
+    <string name="main_manual_input_label">手動入力プロンプト</string>
+    <string name="main_manual_input_placeholder">ここにテキストを入力して Gemini に送信…</string>
+    <string name="action_generate">生成</string>
 
     <!-- Template Management Screen -->
     <string name="title_templates">テンプレート管理</string>
@@ -42,6 +45,12 @@
     <string name="msg_cannot_delete_last_template">最後の 1 件は削除できません。</string>
     <string name="action_move_up">上へ移動</string>
     <string name="action_move_down">下へ移動</string>
+
+    <!-- History Screen -->
+    <string name="title_history">履歴</string>
+    <string name="history_search_placeholder">履歴を検索…</string>
+    <string name="history_pinned_only">ピン留めのみ</string>
+    <string name="action_clear">クリア</string>
 
     <!-- Result Screen -->
     <string name="result_title">Gemini の回答</string>

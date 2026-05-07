@@ -82,6 +82,11 @@
             android:name=".ui.template.PromptTemplateActivity"
             android:exported="false"
             android:label="@string/title_templates" />
+
+        <activity
+            android:name=".ui.history.HistoryActivity"
+            android:exported="false"
+            android:label="@string/title_history" />
     </application>
 
 </manifest>
