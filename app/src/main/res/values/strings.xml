@@ -26,6 +26,23 @@
     <string name="action_hide">隠す</string>
     <string name="action_open_settings">設定を開く</string>
 
+    <!-- Template Management Screen -->
+    <string name="title_templates">テンプレート管理</string>
+    <string name="action_add_template">テンプレートを追加</string>
+    <string name="action_edit">編集</string>
+    <string name="action_delete">削除</string>
+    <string name="action_set_default">デフォルトに設定</string>
+    <string name="label_default">デフォルト</string>
+    <string name="dialog_title_add_template">テンプレートの追加</string>
+    <string name="dialog_title_edit_template">テンプレートの編集</string>
+    <string name="template_title_label">タイトル</string>
+    <string name="template_system_prompt_label">システムプロンプト</string>
+    <string name="action_save">保存</string>
+    <string name="action_cancel">キャンセル</string>
+    <string name="msg_cannot_delete_last_template">最後の 1 件は削除できません。</string>
+    <string name="action_move_up">上へ移動</string>
+    <string name="action_move_down">下へ移動</string>
+
     <!-- Result Screen -->
     <string name="result_title">Gemini の回答</string>
     <string name="action_copy">コピー</string>

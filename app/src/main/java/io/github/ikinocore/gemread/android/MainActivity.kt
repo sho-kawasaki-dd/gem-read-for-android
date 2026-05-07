@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.ikinocore.gemread.android.domain.usecase.IsSettingsCompletedUseCase
 import io.github.ikinocore.gemread.android.ui.settings.SettingsActivity
+import io.github.ikinocore.gemread.android.ui.template.PromptTemplateActivity
 import io.github.ikinocore.gemread.android.ui.theme.GemReadForAndroidTheme
 import javax.inject.Inject
 
@@ -55,6 +56,9 @@ class MainActivity : ComponentActivity() {
                         onOpenSettings = {
                             startActivity(Intent(this, SettingsActivity::class.java))
                         },
+                        onOpenTemplates = {
+                            startActivity(Intent(this, PromptTemplateActivity::class.java))
+                        },
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
@@ -73,6 +77,7 @@ private fun HomeScreen(
     startupMessage: String?,
     requireSettings: Boolean,
     onOpenSettings: () -> Unit,
+    onOpenTemplates: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -109,6 +114,13 @@ private fun HomeScreen(
             Button(onClick = onOpenSettings) {
                 Text(stringResource(R.string.action_open_settings))
             }
+        }
+
+        Button(
+            onClick = onOpenTemplates,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.title_templates))
         }
     }
 }

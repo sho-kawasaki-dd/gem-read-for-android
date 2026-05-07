@@ -77,6 +77,11 @@
             android:name=".ui.settings.SettingsActivity"
             android:exported="false"
             android:label="@string/title_settings" />
+
+        <activity
+            android:name=".ui.template.PromptTemplateActivity"
+            android:exported="false"
+            android:label="@string/title_templates" />
     </application>
 
 </manifest>
