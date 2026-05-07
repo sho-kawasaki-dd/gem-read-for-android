@@ -11,4 +11,5 @@ interface HistoryRepository {
     suspend fun deleteHistory(id: Long)
     suspend fun getHistoryById(id: Long): HistoryEntryEntity?
     suspend fun pruneHistory(maxCount: Int, maxDays: Int)
+    suspend fun sweepOrphanedImages()
 }
