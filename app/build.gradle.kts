@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -13,6 +14,19 @@ android {
     namespace = "io.github.ikinocore.gemread.android"
     compileSdk = 35
 
+    val localProperties = Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use(::load)
+        }
+    }
+
+    fun resolveSigningProperty(envName: String, propertyName: String): String? {
+        return System.getenv(envName)
+            ?: localProperties.getProperty(propertyName)
+            ?: project.findProperty(propertyName)?.toString()
+    }
+
     defaultConfig {
         applicationId = "io.github.ikinocore.gemread.android"
         minSdk = 29
@@ -23,6 +37,18 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            val keystoreFile = project.rootProject.file("release.keystore")
+            val keystorePath = resolveSigningProperty("KEYSTORE_PATH", "RELEASE_KEYSTORE_PATH")
+
+            storeFile = if (keystorePath != null) file(keystorePath) else keystoreFile
+            storePassword = resolveSigningProperty("KEYSTORE_PASSWORD", "RELEASE_KEYSTORE_PASSWORD")
+            keyAlias = resolveSigningProperty("KEY_ALIAS", "RELEASE_KEY_ALIAS")
+            keyPassword = resolveSigningProperty("KEY_PASSWORD", "RELEASE_KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -31,6 +57,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -39,6 +66,12 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    lint {
+        abortOnError = true
+        checkReleaseBuilds = true
+        warningsAsErrors = true
     }
 }
 
@@ -56,6 +89,8 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.google.android.material)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -99,6 +134,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -33,10 +33,33 @@ interface HistoryDao {
     suspend fun deleteHistory(entry: HistoryEntryEntity)
 
     @Query("DELETE FROM history_entries WHERE id = :id")
-    suspend fun deleteHistoryById(id: Long)
+    suspend fun deleteHistoryById(id: Long): Int
+
+    @Query("DELETE FROM history_entries WHERE id IN (:ids)")
+    suspend fun deleteHistoryByIds(ids: List<Long>): Int
 
     @Query("SELECT * FROM history_entries WHERE id = :id")
     suspend fun getHistoryById(id: Long): HistoryEntryEntity?
+
+    @Query("SELECT imagePath FROM history_entries WHERE imagePath IS NOT NULL")
+    suspend fun getAllImagePaths(): List<String>
+
+    @Query(
+        """
+        SELECT * FROM history_entries
+        WHERE pinned = 0
+        AND id NOT IN (
+            SELECT id FROM history_entries
+            WHERE pinned = 0
+            ORDER BY createdAt DESC
+            LIMIT :maxCount
+        )
+        """,
+    )
+    suspend fun getPrunableByCount(maxCount: Int): List<HistoryEntryEntity>
+
+    @Query("SELECT * FROM history_entries WHERE pinned = 0 AND createdAt < :thresholdTimestamp")
+    suspend fun getPrunableByDate(thresholdTimestamp: Long): List<HistoryEntryEntity>
 
     // Pruning: pinned=0 のエントリのみを対象に古い順から削除し、最大 maxCount 件を保持する。
     // サブクエリは unpinned のみを対象とするため、pinned エントリはカウントを圧迫しない。
@@ -52,8 +75,8 @@ interface HistoryDao {
         )
         """,
     )
-    suspend fun pruneByCount(maxCount: Int)
+    suspend fun pruneByCount(maxCount: Int): Int
 
     @Query("DELETE FROM history_entries WHERE pinned = 0 AND createdAt < :thresholdTimestamp")
-    suspend fun pruneByDate(thresholdTimestamp: Long)
+    suspend fun pruneByDate(thresholdTimestamp: Long): Int
 }

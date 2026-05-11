@@ -70,15 +70,18 @@ class GeminiClient @Inject constructor(
     /**
      * Performs a connection test (ping) with minimal cost.
      */
-    suspend fun testConnection(): Result<Unit> = runCatching {
-        val model = getGenerativeModel()
-        model.generateContent("ping")
-        Unit
-    }.onFailure {
-        throw normalizeException(it)
+    suspend fun testConnection(): Result<Unit> {
+        return runCatching {
+            val model = getGenerativeModel()
+            model.generateContent("ping")
+            Unit
+        }.fold(
+            onSuccess = { Result.success(Unit) },
+            onFailure = { Result.failure(normalizeException(it)) },
+        )
     }
 
-    private fun normalizeException(e: Throwable): GeminiError = when {
+    internal fun normalizeException(e: Throwable): GeminiError = when {
         e is GeminiError -> e
         // HTTP 認証エラーを Auth に正規化する。
         e.message?.contains("API_KEY_INVALID", ignoreCase = true) == true -> GeminiError.Auth

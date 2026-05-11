@@ -1,9 +1,56 @@
 <resources>
     <!-- アプリ名 -->
     <string name="app_name">Gem Read</string>
+    <string name="main_description">共有されたテキストや画像を Gemini に渡す MVP です。初回は設定から API キーを保存してください。</string>
+    <string name="main_settings_required_message">共有機能を使うには API キーの設定が必要です。</string>
 
     <!-- Settings Screen -->
     <string name="title_settings">設定</string>
+    <string name="settings_description">Gemini 接続に必要な情報と、Phase 1 の動作設定を管理します。</string>
+    <string name="settings_api_key_label">Gemini API キー</string>
+    <string name="settings_api_key_placeholder">AIza... 形式の API キー</string>
+    <string name="settings_test_connection">接続テスト</string>
+    <string name="settings_connection_testing">接続を確認中…</string>
+    <string name="settings_connection_success">接続に成功しました。</string>
+    <string name="settings_model_label">モデル</string>
+    <string name="settings_system_prompt_label">ベースシステムプロンプト</string>
+    <string name="settings_system_prompt_placeholder">必要なら共通の指示を入力してください。</string>
+    <string name="settings_image_resize_label">画像リサイズ</string>
+    <string name="settings_image_resize_summary">ON の場合は長辺 1568px・JPEG quality 85 を目安に縮小して送信します。</string>
+    <string name="settings_streaming_label">ストリーミング</string>
+    <string name="settings_streaming_summary">ON の場合は回答を逐次受信し、結果画面に追記表示します。</string>
+    <string name="settings_history_count_label">履歴保持件数</string>
+    <string name="settings_history_days_label">履歴保持日数</string>
+    <string name="action_close">閉じる</string>
+    <string name="action_show">表示</string>
+    <string name="action_hide">隠す</string>
+    <string name="action_open_settings">設定を開く</string>
+    <string name="main_manual_input_label">手動入力プロンプト</string>
+    <string name="main_manual_input_placeholder">ここにテキストを入力して Gemini に送信…</string>
+    <string name="action_generate">生成</string>
+
+    <!-- Template Management Screen -->
+    <string name="title_templates">テンプレート管理</string>
+    <string name="action_add_template">テンプレートを追加</string>
+    <string name="action_edit">編集</string>
+    <string name="action_delete">削除</string>
+    <string name="action_set_default">デフォルトに設定</string>
+    <string name="label_default">デフォルト</string>
+    <string name="dialog_title_add_template">テンプレートの追加</string>
+    <string name="dialog_title_edit_template">テンプレートの編集</string>
+    <string name="template_title_label">タイトル</string>
+    <string name="template_system_prompt_label">システムプロンプト</string>
+    <string name="action_save">保存</string>
+    <string name="action_cancel">キャンセル</string>
+    <string name="msg_cannot_delete_last_template">最後の 1 件は削除できません。</string>
+    <string name="action_move_up">上へ移動</string>
+    <string name="action_move_down">下へ移動</string>
+
+    <!-- History Screen -->
+    <string name="title_history">履歴</string>
+    <string name="history_search_placeholder">履歴を検索…</string>
+    <string name="history_pinned_only">ピン留めのみ</string>
+    <string name="action_clear">クリア</string>
 
     <!-- Result Screen -->
     <string name="result_title">Gemini の回答</string>
@@ -19,5 +66,8 @@
     <string name="error_unknown">予期せぬエラーが発生しました。</string>
     <string name="error_process_death">アプリのプロセスが終了したため、生成が中断されました。</string>
     <string name="msg_multiple_images">先頭の1枚のみ処理しました。複数枚同時解析は今後対応予定です。</string>
+    <string name="error_transaction_too_large">共有されたデータが大きすぎるため、処理できませんでした。</string>
+    <string name="error_unsupported_share_input">この共有データは Phase 1 では処理できません。</string>
+    <string name="share_requires_settings_message">共有機能を使う前に API キーを設定してください。</string>
     <string name="content_description_input_preview">入力画像のプレビュー</string>
 </resources>

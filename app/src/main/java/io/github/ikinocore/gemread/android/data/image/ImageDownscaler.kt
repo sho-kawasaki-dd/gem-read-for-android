@@ -87,7 +87,7 @@ class ImageDownscaler @Inject constructor(
     }
 
     private fun isPassthroughAllowed(uri: Uri): Boolean {
-        val mimeType = context.contentResolver.getType(uri)
+        val mimeType = resolveMimeType(uri)
         val allowedMimeTypes = listOf("image/jpeg", "image/png", "image/webp")
         if (mimeType !in allowedMimeTypes) return false
 
@@ -169,5 +169,12 @@ class ImageDownscaler @Inject constructor(
         MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
     } else {
         MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+    }
+
+    private fun resolveMimeType(uri: Uri): String? = if (uri.scheme == "content") {
+        context.contentResolver.getType(uri)
+    } else {
+        val extension = getExtensionFromUri(uri)?.lowercase().orEmpty()
+        MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
     }
 }

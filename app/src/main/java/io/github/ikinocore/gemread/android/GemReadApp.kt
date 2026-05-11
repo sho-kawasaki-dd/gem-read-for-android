@@ -46,7 +46,11 @@ class GemReadApp : Application() {
             val maxDays = appPreferences.historyRetentionDays.first()
             historyRepository.pruneHistory(maxCount, maxDays)
 
-            // 3. 起動時 sweep: 前回セッションで保存されなかった一時画像キャッシュを削除する。
+            // 3. DB に参照されていない履歴画像を回収する。
+            // 強制終了や best effort cleanup の取りこぼしがあっても起動時に整合性を回復する。
+            historyRepository.sweepOrphanedImages()
+
+            // 4. 起動時 sweep: 前回セッションで保存されなかった一時画像キャッシュを削除する。
             // 履歴に昇格済みの画像は filesDir/history/ に移動済みのため影響を受けない。
             imageDownscaler.clearCache()
         }
